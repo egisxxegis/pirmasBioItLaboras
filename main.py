@@ -9,8 +9,44 @@ def split_into_reading_frames(seq_obj):
     return the_split
 
 
-def find_start_end(something):
-    return 6, 9
+def find_start_ends(translated_seq_obj):
+    # we get Seq(Q*MQMM*M**Q)
+    # we return [(2,6), (4,6), (5,6), (7,8)] - pairs of M and * pos
+    the_start_ends = []
+    the_starts = []
+    the_ends = []
+    if len(translated_seq_obj) < 1:
+        return the_start_ends
+
+    # find all starts ant ends
+    for position in range(len(translated_seq_obj)):
+        if translated_seq_obj[position] == 'M':
+            the_starts.append(position)
+        elif translated_seq_obj[position] == '*':
+            the_ends.append(position)
+    if len(the_starts) < 1 or len(the_ends) < 1:
+        return the_start_ends
+
+    # make pairs
+    the_index_to_check_start = 0
+    the_index_to_check_end = 0
+    while True:
+        start = the_starts[the_index_to_check_start]
+        end = the_ends[the_index_to_check_end]
+        if end < start:
+            # take another end
+            the_index_to_check_end += 1
+            if the_index_to_check_end >= len(the_ends):
+                break
+            continue
+
+        the_start_ends.append((start, end))
+        the_index_to_check_start += 1
+        if the_index_to_check_start >= len(the_starts):
+            break
+        continue
+
+    return the_start_ends
 
 
 if __name__ == '__main__':
@@ -25,6 +61,8 @@ if __name__ == '__main__':
         print(f'symbols:    {len(seq_record)}')
         main_frames = split_into_reading_frames(seq_record)
         reverse_complement_frames = split_into_reading_frames(seq_record.reverse_complement())
+        # start_ends = [find_start_ends(frame.translate()) for frame in main_frames]
+        start_ends = find_start_ends(Seq("Q*MQMM*M**Q"))
 
 else:
     print(f'Execution cancelled, not the main.py called')
