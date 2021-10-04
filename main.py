@@ -1,8 +1,12 @@
-from Bio import SeqIO, Seq
+from Bio import SeqIO
+from Bio.Seq import Seq
 
 
-def split_into_reading_frames(seq_obj, offset=0):
-    return 420
+def split_into_reading_frames(seq_obj):
+    # we get Seq(AAAGGGTTT)
+    # we return [Seq(AAAGGGTTT), Seq(AAGGGT), Seq(AGGGTT)]
+    the_split = [seq_obj[x:(len(seq_obj)-x)//3*3+x] for x in range(3)]
+    return the_split
 
 
 def find_start_end(something):
@@ -19,6 +23,8 @@ if __name__ == '__main__':
         print(f'translated: {repr(seq_record.seq.translate())}')
         print(f'reversed:   {repr(seq_record.seq.reverse_complement())}')
         print(f'symbols:    {len(seq_record)}')
+        main_frames = split_into_reading_frames(seq_record)
+        reverse_complement_frames = split_into_reading_frames(seq_record.reverse_complement())
 
 else:
     print(f'Execution cancelled, not the main.py called')
