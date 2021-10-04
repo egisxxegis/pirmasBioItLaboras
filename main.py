@@ -1,16 +1,24 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from Bio import SeqIO, Seq
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def split_into_reading_frames(seq_obj, offset=0):
+    return 420
 
 
-# Press the green button in the gutter to run the script.
+def find_start_end(something):
+    return 6, 9
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    bacterials = [f'sources\\data\\bacterial{x+1}.fasta' for x in range(4)]
+    mamalians = [f'sources\\data\\mamalian{x+1}.fasta' for x in range(4)]
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    for seq_record in SeqIO.parse(bacterials[2], "fasta"):
+        print(seq_record.id)
+        print(f'original:   {repr(seq_record.seq)}')
+        print(f'translated: {repr(seq_record.seq.translate())}')
+        print(f'reversed:   {repr(seq_record.seq.reverse_complement())}')
+        print(f'symbols:    {len(seq_record)}')
+
+else:
+    print(f'Execution cancelled, not the main.py called')
