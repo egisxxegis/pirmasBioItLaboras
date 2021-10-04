@@ -49,6 +49,19 @@ def find_start_ends(translated_seq_obj):
     return the_start_ends
 
 
+def filter_start_end_to_longest_pairs(start_stops):
+    # we get [(2,6), (4,6), (5,6), (7,8)]
+    # we return [(2,6), (7, 8)]
+    the_last_checked_end = 0
+    the_start_ends = []
+    for start, stop in start_stops:
+        if stop == the_last_checked_end:
+            continue
+        the_start_ends.append((start, stop))
+        the_last_checked_end = stop
+    return the_start_ends
+
+
 if __name__ == '__main__':
     bacterials = [f'sources\\data\\bacterial{x+1}.fasta' for x in range(4)]
     mamalians = [f'sources\\data\\mamalian{x+1}.fasta' for x in range(4)]
@@ -61,8 +74,13 @@ if __name__ == '__main__':
         print(f'symbols:    {len(seq_record)}')
         main_frames = split_into_reading_frames(seq_record)
         reverse_complement_frames = split_into_reading_frames(seq_record.reverse_complement())
-        # start_ends = [find_start_ends(frame.translate()) for frame in main_frames]
-        start_ends = find_start_ends(Seq("Q*MQMM*M**Q"))
+        start_ends = [find_start_ends(frame.translate()) for frame in main_frames]
+        reverse_start_ends = [find_start_ends(frame.translate()) for frame in reverse_complement_frames]
+        # task 1 done.
+        start_ends_no_overlap = [filter_start_end_to_longest_pairs(pairs) for pairs in start_ends]
+        reverse_start_ends_no_overlap = [filter_start_end_to_longest_pairs(pairs) for pairs in reverse_start_ends]
+        # task 2 done.
+
 
 else:
     print(f'Execution cancelled, not the main.py called')

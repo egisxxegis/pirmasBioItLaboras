@@ -1,17 +1,14 @@
-from main import split_into_reading_frames, find_start_ends
+from main import split_into_reading_frames, find_start_ends, filter_start_end_to_longest_pairs
 
 the_split = split_into_reading_frames("AAAGGGTTT")
-if len(the_split) != 3 or\
-        the_split[0] != "AAAGGGTTT" or\
-        the_split[1] != "AAGGGT" or\
-        the_split[2] != "AGGGTT":
-    print("split into reading frames failed.")
+if the_split != ["AAAGGGTTT", "AAGGGT", "AGGGTT"]:
+    print("---split into reading frames failed.")
 
 the_start_ends = find_start_ends("Q*MQMM*M**Q")
-if the_start_ends[0] != (2, 6) or\
-        the_start_ends[1] != (4, 6) or\
-        the_start_ends[2] != (5, 6) or\
-        the_start_ends[3] != (7, 8):
-    print("find start ends failed.")
+if the_start_ends != [(2, 6), (4, 6), (5, 6), (7, 8)]:
+    print("---find start ends failed.")
 
+the_start_ends_filtered = filter_start_end_to_longest_pairs([(2, 6), (4, 6), (5, 6), (7, 8)])
+if the_start_ends_filtered != [(2, 6), (7, 8)]:
+    print("---filter start end to longest pairs failed.")
 print("tests done")
