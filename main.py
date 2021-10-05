@@ -1,5 +1,6 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
+from math import ceil
 
 
 def split_into_reading_frames(seq_obj):
@@ -62,6 +63,18 @@ def filter_start_end_to_longest_pairs(start_stops):
     return the_start_ends
 
 
+def extract_fragments(sequence_object, start_stops, minimum_length=1):
+    # we get Seq(Q*MQMM*M**Q), [(2, 6), (7, 8)], 2
+    # we return [Seq(MQMM), Seq(M)]
+    the_fragments = []
+    for start, stop in start_stops:
+        if stop - start < minimum_length:
+            continue
+        the_fragment = sequence_object[start:stop]
+        the_fragments.append(the_fragment)
+    return the_fragments
+
+
 if __name__ == '__main__':
     bacterials = [f'sources\\data\\bacterial{x+1}.fasta' for x in range(4)]
     mamalians = [f'sources\\data\\mamalian{x+1}.fasta' for x in range(4)]
@@ -74,12 +87,15 @@ if __name__ == '__main__':
         print(f'symbols:    {len(seq_record)}')
         main_frames = split_into_reading_frames(seq_record)
         reverse_complement_frames = split_into_reading_frames(seq_record.reverse_complement())
-        start_ends = [find_start_ends(frame.translate()) for frame in main_frames]
-        reverse_start_ends = [find_start_ends(frame.translate()) for frame in reverse_complement_frames]
-        # task 1 done.
-        start_ends_no_overlap = [filter_start_end_to_longest_pairs(pairs) for pairs in start_ends]
-        reverse_start_ends_no_overlap = [filter_start_end_to_longest_pairs(pairs) for pairs in reverse_start_ends]
-        # task 2 done.
+        all_frames = main_frames + reverse_complement_frames
+        all_frames_start_ends = [find_start_ends(frame.translate()) for frame in all_frames]
+        # task 1 done above.
+        all_frames_start_ends_no_overlap = [filter_start_end_to_longest_pairs(pairs) for pairs in all_frames_start_ends]
+        # task 2 done above.
+        minimum_bp = 100  # three bp codes one amino acid
+        fragments = [extract_fragments(all_frames[i], all_frames_start_ends_no_overlap[i], ceil(minimum_bp / 3))
+                     for i in range(len(all_frames))]
+        # task 3 done above.
 
 
 else:
