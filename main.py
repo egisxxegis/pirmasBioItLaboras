@@ -1,6 +1,7 @@
 from Bio import SeqIO
 from Bio.Seq import Seq
 from math import ceil
+import numpy as np
 
 
 def split_into_reading_frames(seq_obj):
@@ -75,6 +76,26 @@ def extract_fragments(sequence_object, start_stops, minimum_length=1):
     return the_fragments
 
 
+def occurrences(the_haystack, the_needle):
+    the_count = 0
+    the_start = 0
+    while True:
+        the_start = the_haystack.find(the_needle, the_start) + 1
+        if the_start > 0:
+            the_count += 1
+        else:
+            return the_count
+
+
+def count_frequency(arr_where, arr_what):
+    the_total_frequency = np.zeros(len(arr_what))
+    for seq in arr_where:
+        the_length_of_seq = len(seq) - len(arr_what[0]) + 1
+        for i in range(len(arr_what)):
+            the_total_frequency[i] += occurrences(seq, arr_what[i]) / the_length_of_seq
+    return the_total_frequency / len(arr_where)
+
+
 if __name__ == '__main__':
     bacterials = [f'sources\\data\\bacterial{x+1}.fasta' for x in range(4)]
     mamalians = [f'sources\\data\\mamalian{x+1}.fasta' for x in range(4)]
@@ -85,8 +106,8 @@ if __name__ == '__main__':
         print(f'translated: {repr(seq_record.seq.translate())}')
         print(f'reversed:   {repr(seq_record.seq.reverse_complement())}')
         print(f'symbols:    {len(seq_record)}')
-        main_frames = split_into_reading_frames(seq_record)
-        reverse_complement_frames = split_into_reading_frames(seq_record.reverse_complement())
+        main_frames = split_into_reading_frames(seq_record.seq)
+        reverse_complement_frames = split_into_reading_frames(seq_record.seq.reverse_complement())
         all_frames = main_frames + reverse_complement_frames
         all_frames_start_ends = [find_start_ends(frame.translate()) for frame in all_frames]
         # task 1 done above.
@@ -96,6 +117,12 @@ if __name__ == '__main__':
         fragments = [extract_fragments(all_frames[i], all_frames_start_ends_no_overlap[i], ceil(minimum_bp / 3))
                      for i in range(len(all_frames))]
         # task 3 done above.
+        translated_nucleotides = "ARNDCEQGHILKMFPSTWYV"
+        translated_dicodones = [codone + codone2
+                                for codone in translated_nucleotides
+                                for codone2 in translated_nucleotides]
+        frequency_of_codones = count_frequency(all_frames, translated_nucleotides)
+        frequency_of_dicodones = count_frequency(all_frames, translated_dicodones)
 
 
 else:

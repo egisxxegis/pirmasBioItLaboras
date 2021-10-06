@@ -1,8 +1,11 @@
+import numpy as np
 from main import \
     split_into_reading_frames, \
     find_start_ends, \
     filter_start_end_to_longest_pairs, \
-    extract_fragments
+    extract_fragments, \
+    occurrences, \
+    count_frequency
 
 the_split = split_into_reading_frames("AAAGGGTTT")
 if the_split != ["AAAGGGTTT", "AAGGGT", "AGGGTT"]:
@@ -19,4 +22,22 @@ if the_start_ends_filtered != [(2, 6), (7, 8)]:
 the_fragments = extract_fragments("Q*MQMM*M**Q", [(2, 6), (7, 8)], 2)
 if the_fragments != ["MQMM"]:
     print("---extract fragments failed.")
+
+the_occurences = occurrences("AAABAAA", "AA")
+if the_occurences != 4:
+    print("---The occurences failed.")
+
+the_where1 = ["Q*MQMM*M**Q", "MAAQQA*QQ", "QQ*TA*AAMM*"]
+the_what1 = "QMAR"
+the_where2 = ["Q*MQMM*M**Q", "MAAAAA*AM"]
+the_what2 = ["QQ", "QM", "QA", "MQ", "MM", "MA", "AQ", "AM", "AA"]
+the_frequency = count_frequency(the_where1, the_what1)
+the_answer = np.array([0.2996632996632997, 0.21885521885521886, 0.202020202020202, 0.0])
+if not (the_frequency == the_answer).all():
+    print("---frequency with one letters failed.")
+the_frequency = count_frequency(the_where2, the_what2)
+the_answer = np.array([0., 0.05, 0., 0.05, 0.05, 0.0625, 0., 0.0625, 0.25])
+if not (the_frequency == the_answer).all():
+    print("---frequency with two letters failed.")
+
 print("tests done")
