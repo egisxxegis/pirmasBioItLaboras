@@ -2,6 +2,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from math import ceil
 import numpy as np
+from tabulate import tabulate
 
 
 def split_into_reading_frames(seq_obj):
@@ -96,6 +97,46 @@ def count_frequency(arr_where, arr_what):
     return the_total_frequency / len(arr_where)
 
 
+def print_data_in_table(data, top_down_headers=None, left_right_headers=None, dimensions=1):
+    if left_right_headers is None:
+        left_right_headers = ["data"]
+    if dimensions < 1 or dimensions > 2:
+        print(f'{dimensions} dimensions are not supported in print_data_in_table.')
+        return
+    if dimensions == 1:
+        if top_down_headers is None:
+            print(tabulate(data, left_right_headers))
+        else:
+            new_data = []
+            for index in range(len(data)):
+                new_data.append([top_down_headers[index], data[index]])
+            print(tabulate(new_data, ["name"] + left_right_headers))
+        return
+    elif dimensions == 2:
+        # we substract one because top_down_headers will be added
+        if len(data) % (len(left_right_headers)-1) > 0:
+            print(f'Given data cannot be converted to {len(left_right_headers)} column table.')
+            return
+        elif len(left_right_headers) == 1:
+            print(f'1 column header can not form 2 dimensional table.')
+            return
+        if top_down_headers is None:
+            print(f'top down headers are must for 2 dimensional table. Else use 1 dimensional')
+            return
+        new_data = []
+        the_index = 0
+        the_index_of_header = 0
+        the_length = len(left_right_headers) - 1
+        while the_index + the_length < len(data)+1:
+            new_data.append(
+                [top_down_headers[the_index_of_header]]
+                + data[the_index: the_index + the_length])
+            the_index += the_length
+            the_index_of_header += 1
+        print(tabulate(new_data, left_right_headers))
+        return
+
+
 if __name__ == '__main__':
     bacterials = [f'sources\\data\\bacterial{x+1}.fasta' for x in range(4)]
     mamalians = [f'sources\\data\\mamalian{x+1}.fasta' for x in range(4)]
@@ -109,20 +150,32 @@ if __name__ == '__main__':
         main_frames = split_into_reading_frames(seq_record.seq)
         reverse_complement_frames = split_into_reading_frames(seq_record.seq.reverse_complement())
         all_frames = main_frames + reverse_complement_frames
-        all_frames_start_ends = [find_start_ends(frame.translate()) for frame in all_frames]
+        all_frames_translated = [frame.translate() for frame in all_frames]
+        all_frames_start_ends = [find_start_ends(translated_frame) for translated_frame in all_frames_translated]
         # task 1 done above.
         all_frames_start_ends_no_overlap = [filter_start_end_to_longest_pairs(pairs) for pairs in all_frames_start_ends]
         # task 2 done above.
         minimum_bp = 100  # three bp codes one amino acid
-        fragments = [extract_fragments(all_frames[i], all_frames_start_ends_no_overlap[i], ceil(minimum_bp / 3))
-                     for i in range(len(all_frames))]
+        fragments = [extract_fragments(all_frames_translated[i],
+                                       all_frames_start_ends_no_overlap[i],
+                                       ceil(minimum_bp / 3))
+                     for i in range(len(all_frames_translated))]
         # task 3 done above.
         translated_nucleotides = "ARNDCEQGHILKMFPSTWYV"
         translated_dicodones = [codone + codone2
                                 for codone in translated_nucleotides
                                 for codone2 in translated_nucleotides]
-        frequency_of_codones = count_frequency(all_frames, translated_nucleotides)
-        frequency_of_dicodones = count_frequency(all_frames, translated_dicodones)
+        frequency_of_codones = count_frequency(all_frames_translated, translated_nucleotides)
+        frequency_of_dicodones = count_frequency(all_frames_translated, translated_dicodones)
+        print_data_in_table(frequency_of_codones.tolist(),
+                            top_down_headers=translated_nucleotides,
+                            left_right_headers=["Codone", "Frequency"],
+                            dimensions=2)
+        print_data_in_table(frequency_of_dicodones.tolist(),
+                            top_down_headers=translated_nucleotides,
+                            left_right_headers=["name"] + [*translated_nucleotides],
+                            dimensions=2)
+        # task 4 done above.
 
 
 else:
