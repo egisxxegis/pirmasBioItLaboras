@@ -6,7 +6,8 @@ from main import \
     extract_fragments, \
     occurrences, \
     count_frequency, \
-    format_numpy_array_digits
+    format_numpy_array_digits, \
+    calculate_difference_frequencies
 
 the_split = split_into_reading_frames("AAAGGGTTT")
 if the_split != ["AAAGGGTTT", "AAGGGT", "AGGGTT"]:
@@ -55,6 +56,8 @@ the_answer = np.array([0.0, 12.5, 0.0023, 0.0024, 0.1235, 0, 0.0001])
 if not (the_formatted_numpy_array == the_answer).all():
     print("---numpy array formatting with NO near zeros and rounding failed.")
 
-
+the_score = calculate_difference_frequencies(np.array([0, 1, 2]), np.array([0, 1, 2]))
+if the_score != 0:
+    print("---calculate difference failed calculating difference of two same arguments.")
 
 print("tests done")
