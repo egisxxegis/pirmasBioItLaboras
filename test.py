@@ -5,7 +5,8 @@ from main import \
     filter_start_end_to_longest_pairs, \
     extract_fragments, \
     occurrences, \
-    count_frequency
+    count_frequency, \
+    format_numpy_array_digits
 
 the_split = split_into_reading_frames("AAAGGGTTT")
 if the_split != ["AAAGGGTTT", "AAGGGT", "AGGGTT"]:
@@ -39,5 +40,21 @@ the_frequency = count_frequency(the_where2, the_what2)
 the_answer = np.array([0., 0.05, 0., 0.05, 0.05, 0.0625, 0., 0.0625, 0.25])
 if not (the_frequency == the_answer).all():
     print("---frequency with two letters failed.")
+
+the_numpy_array = np.array([0.0, 12.5, 0.00231, 0.00235, 0.12345, 0.00001, 0.00005])
+the_formatted_numpy_array = format_numpy_array_digits(the_numpy_array, 4, True, True)
+the_answer = np.array([0.0, 12.5, 0.0023, 0.0024, 0.1235, 0.0001, 0.0001])
+if not (the_formatted_numpy_array == the_answer).all():
+    print("---numpy array formatting with near zeros and rounding failed.")
+the_formatted_numpy_array = format_numpy_array_digits(the_numpy_array, 4, True, False)
+the_answer = np.array([0.0, 12.5, 0.0023, 0.0023, 0.1234, 0.0001, 0.0001])
+if not (the_formatted_numpy_array == the_answer).all():
+    print("---numpy array formatting with near zeros and NO rounding failed.")
+the_formatted_numpy_array = format_numpy_array_digits(the_numpy_array, 4, False, True)
+the_answer = np.array([0.0, 12.5, 0.0023, 0.0024, 0.1235, 0, 0.0001])
+if not (the_formatted_numpy_array == the_answer).all():
+    print("---numpy array formatting with NO near zeros and rounding failed.")
+
+
 
 print("tests done")

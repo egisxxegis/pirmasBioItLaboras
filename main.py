@@ -97,6 +97,26 @@ def count_frequency(arr_where, arr_what):
     return the_total_frequency / len(arr_where)
 
 
+def format_numpy_array_digits(numpy_array,
+                              decimal_spaces,
+                              should_near_zero_be_adjusted_to_low_value=True,
+                              do_the_round=False):
+    the_divisor = 10 ** decimal_spaces
+    the_low_limit = 10 ** -decimal_spaces
+    the_return = numpy_array * the_divisor // 1 / the_divisor
+    if do_the_round:
+        the_divisor = the_divisor * 10
+        the_return = ((numpy_array * the_divisor % 10) >= 5) \
+            * the_low_limit \
+            + the_return
+    if should_near_zero_be_adjusted_to_low_value:
+        the_low_limit_compare = the_low_limit if not do_the_round else the_low_limit / 2
+        the_return = (numpy_array < the_low_limit_compare) * (numpy_array > 0) \
+            * the_low_limit \
+            + the_return
+    return the_return
+
+
 def print_data_in_table(data, top_down_headers=None, left_right_headers=None, dimensions=1):
     if left_right_headers is None:
         left_right_headers = ["data"]
@@ -114,7 +134,7 @@ def print_data_in_table(data, top_down_headers=None, left_right_headers=None, di
         return
     elif dimensions == 2:
         # we substract one because top_down_headers will be added
-        if len(data) % (len(left_right_headers)-1) > 0:
+        if len(data) % (len(left_right_headers) - 1) > 0:
             print(f'Given data cannot be converted to {len(left_right_headers)} column table.')
             return
         elif len(left_right_headers) == 1:
@@ -171,10 +191,13 @@ if __name__ == '__main__':
                             top_down_headers=translated_nucleotides,
                             left_right_headers=["Codone", "Frequency"],
                             dimensions=2)
-        print_data_in_table(frequency_of_dicodones.tolist(),
+        print_data_in_table(format_numpy_array_digits(frequency_of_dicodones,
+                                                      decimal_spaces=4,
+                                                      should_near_zero_be_adjusted_to_low_value=True,
+                                                      do_the_round=True).tolist(),
                             top_down_headers=translated_nucleotides,
                             left_right_headers=["name"] + [*translated_nucleotides],
-                            dimensions=2)
+                            dimensions=2,)
         # task 4 done above.
 
 
