@@ -34,6 +34,9 @@ if __name__ == '__main__':
                                            all_frames_start_ends_no_overlap[i],
                                            ceil(minimum_bp / 3))
                          for i in range(len(all_frames_translated))]
+            print("tai butu baltymų koduojancios sekos")
+            for frame_of_fragments in fragments:
+                print(frame_of_fragments)
             # task 3 done above.
 
             translated_nucleotides = "ARNDCEQGHILKMFPSTWYV"
