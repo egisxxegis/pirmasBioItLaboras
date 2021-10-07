@@ -176,26 +176,27 @@ def calculate_difference_frequencies(numpy_array_frequencies1, numpy_array_frequ
     the_mask = (the_ratio > 4)
     the_ratio = np.invert(the_mask) * the_ratio + the_mask * 4
     # rate values
-    the_thresholds = [3.5, 3.0, 2.6, 2.2, 2.0, 1.8, 1.6, 1.4, 1.3, 1.0]
+    # the_thresholds = [3.5, 3.0, 2.6, 2.2, 2.0, 1.8, 1.6, 1.4, 1.3, 1.0]
+    the_thresholds = [4.0, 3.0, 2.0, 1.3, 1.0]
     the_max_weight = -1 * len(the_thresholds) - 1
     for the_index in range(len(the_thresholds)):
         the_mask = (the_ratio >= the_thresholds[the_index])
         the_ratio = the_mask * the_ratio * (the_max_weight + the_index) + the_ratio
-
-    # the_ratio = (the_ratio >= 3.5) * -11
-    # the_ratio = (the_ratio >= 3.0) * -10
-    # the_ratio = (the_ratio >= 2.6) * -9
-    # the_ratio = (the_ratio >= 2.2) * -8
-    # the_ratio = (the_ratio >= 2.0) * -7
-    # the_ratio = (the_ratio >= 1.8) * -6
-    # the_ratio = (the_ratio >= 1.6) * -5
-    # the_ratio = (the_ratio >= 1.4) * -4
-    # the_ratio = (the_ratio >= 1.3) * -3
-    # the_ratio = (the_ratio >= 1.0) * -2
     the_ratio = the_ratio * -1
 
     # calculate final rate
     return the_ratio.mean()-1
+
+
+def print_in_phylip(phylip_array):
+    the_row_count = phylip_array[0]
+    print(the_row_count)
+    the_start = True
+    for the_row in phylip_array:
+        if the_start:
+            the_start = False
+            continue
+        print(' '.join(the_row))
 
 
 if __name__ == '__main__':
@@ -255,18 +256,26 @@ if __name__ == '__main__':
     for frequency in all_viruses_codones_frequencies:
         frequency_row = [frequency[0]]  # name of sample
         for i in range(len(all_viruses_codones_frequencies)):
-            frequency_row.append(calculate_difference_frequencies(frequency[1],
-                                                                  all_viruses_codones_frequencies[i][1]))
+            distance = calculate_difference_frequencies(frequency[1],
+                                                        all_viruses_codones_frequencies[i][1])
+            frequency_row.append(f'{distance:2.5f}')
         distance_codone_in_phylip.append(frequency_row)
 
     distance_dicodone_in_phylip = [len(all_viruses_dicodones_frequencies)]
     for frequency in all_viruses_dicodones_frequencies:
         frequency_row = [frequency[0]]  # name of sample
         for i in range(len(all_viruses_dicodones_frequencies)):
-            frequency_row.append(calculate_difference_frequencies(frequency[1],
-                                                                  all_viruses_dicodones_frequencies[i][1]))
+            distance = calculate_difference_frequencies(frequency[1],
+                                                        all_viruses_dicodones_frequencies[i][1])
+            frequency_row.append(f'{distance:2.5f}')
         distance_dicodone_in_phylip.append(frequency_row)
 
+    print("\nCodon distance matrix in Phylip")
+    print_in_phylip(distance_codone_in_phylip)
+
+    print("\nDicodon distance matrix in Phylip")
+    print_in_phylip(distance_dicodone_in_phylip)
+    # task 5 done above.
 
 else:
     print(f'Execution cancelled, not the main.py called')
